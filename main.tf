@@ -1,5 +1,9 @@
-# important!!! DO NOT USE THIS FOR PRODUCTION ENVIRONMENTS, only temporary test environments. 
+# Important!!! DO NOT USE THIS FOR PRODUCTION ENVIRONMENTS, only temporary test environments. 
 # The key pair created in this template is stored in the terraform state file unencrypted! 
+
+# Sources: 
+# https://cloudkatha.com/how-to-create-ec2-instance-using-terraform-with-key-pair-on-aws/
+# https://cloudkatha.com/how-to-create-key-pair-in-aws-using-terraform-in-right-way/
 
 provider "aws" {
   region = "us-east-1"
@@ -15,11 +19,6 @@ resource "tls_private_key" "demo_key" {
   rsa_bits  = 4096
 }
 
-#resource "aws_key_pair" "key_pair" {
-#  key_name   = "keypairname"
-#  public_key = tls_private_key.demo_key.public_key_openssh
-#}
-
 resource "aws_key_pair" "generated_key" {
   key_name   = var.key_pair_name
   public_key = tls_private_key.demo_key.public_key_openssh
@@ -31,7 +30,7 @@ resource "local_file" "local_key_pair" {
   content = tls_private_key.demo_key.private_key_pem
 }
 
-
+# creates a EC2 with AWS CLI and crontab installed
 resource "aws_instance" "my_ec2_instance" {
   ami           = "ami-0f34c5ae932e6f0e4"
   instance_type = "t2.micro"
@@ -44,3 +43,6 @@ resource "aws_instance" "my_ec2_instance" {
     sudo ./aws/install
     EOF
 } 
+
+
+
